@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eclipse-userlibraries>
+  <library name="Maven: org.lwjgl:lwjgl:3.1.2">
+    <archive path="C:/Users/Tony/.m2/repository/org/lwjgl/lwjgl/3.1.2/lwjgl-3.1.2.jar" />
+  </library>
+  <library name="Maven: org.lwjgl:lwjgl-glfw:3.1.2">
+    <archive path="C:/Users/Tony/.m2/repository/org/lwjgl/lwjgl-glfw/3.1.2/lwjgl-glfw-3.1.2.jar" />
+  </library>
+  <library name="Maven: org.lwjgl:lwjgl-opengl:3.1.2">
+    <archive path="C:/Users/Tony/.m2/repository/org/lwjgl/lwjgl-opengl/3.1.2/lwjgl-opengl-3.1.2.jar" />
+  </library>
+  <library name="Maven: org.joml:joml:1.9.3">
+    <archive path="C:/Users/Tony/.m2/repository/org/joml/joml/1.9.3/joml-1.9.3.jar" />
+  </library>
+  <library name="Maven: org.l33tlabs.twl:pngdecoder:1.0">
+    <archive path="C:/Users/Tony/.m2/repository/org/l33tlabs/twl/pngdecoder/1.0/pngdecoder-1.0.jar" />
+  </library>
+  <library name="Maven: org.lwjgl:lwjgl-openal:3.1.2">
+    <archive path="C:/Users/Tony/.m2/repository/org/lwjgl/lwjgl-openal/3.1.2/lwjgl-openal-3.1.2.jar" />
+  </library>
+  <library name="Maven: org.lwjgl:lwjgl-stb:3.1.2">
+    <archive path="C:/Users/Tony/.m2/repository/org/lwjgl/lwjgl-stb/3.1.2/lwjgl-stb-3.1.2.jar" />
+  </library>
+  <library name="Maven: org.lwjgl:lwjgl:natives-windows:3.1.2">
+    <archive path="C:/Users/Tony/.m2/repository/org/lwjgl/lwjgl/3.1.2/lwjgl-3.1.2-natives-windows.jar" />
+  </library>
+  <library name="Maven: org.lwjgl:lwjgl-openal:natives-windows:3.1.2">
+    <archive path="C:/Users/Tony/.m2/repository/org/lwjgl/lwjgl-openal/3.1.2/lwjgl-openal-3.1.2-natives-windows.jar" />
+  </library>
+  <library name="Maven: org.lwjgl:lwjgl-stb:natives-windows:3.1.2">
+    <archive path="C:/Users/Tony/.m2/repository/org/lwjgl/lwjgl-stb/3.1.2/lwjgl-stb-3.1.2-natives-windows.jar" />
+  </library>
+  <library name="Maven: org.lwjgl:lwjgl-glfw:natives-windows:3.1.2">
+    <archive path="C:/Users/Tony/.m2/repository/org/lwjgl/lwjgl-glfw/3.1.2/lwjgl-glfw-3.1.2-natives-windows.jar" />
+  </library>
+  <library name="Maven: org.lwjgl:lwjgl-opengl:natives-windows:3.1.2">
+    <archive path="C:/Users/Tony/.m2/repository/org/lwjgl/lwjgl-opengl/3.1.2/lwjgl-opengl-3.1.2-natives-windows.jar" />
+  </library>
+</eclipse-userlibraries>
+
