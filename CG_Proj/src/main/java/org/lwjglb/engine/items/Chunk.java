@@ -5,7 +5,6 @@ import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.lwjglb.engine.graph.HeightMapMesh;
-import org.lwjglb.engine.items.GameItem;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,7 +23,7 @@ public class Chunk extends GameItem {
     public Chunk(Vector2i chunkPosition, HeightMapMesh mesh) {
         super(mesh.getMesh());
         this.chunkPosition = chunkPosition;
-        this.heightMapMesh=mesh;
+        this.heightMapMesh = mesh;
     }
 
     public Collection<Vector2i> getAdjacentChunksPositions() {
@@ -35,13 +34,21 @@ public class Chunk extends GameItem {
         return Arrays.asList(res);
     }
 
-    //returns the hegiht in world coordinates of a given point in world coordinates
+    public float getHeightFromChunkLocalCoordinates(float x, float z) {
+        Vector3f[] triangle = getTriangles(new Vector2f(x,z));
+        //convert to world
+        x=(x+chunkPosition.x)*getScale();
+        z=(z+chunkPosition.y)*getScale();
+        float result = interpolateHeight(triangle[0], triangle[1], triangle[2], x, z);
+        return result;
+    }
+
+    //returns the height in world coordinates of a given point in world coordinates which is within this chunk
     public float getHeight(float x, float z) {
         Vector2f coordinate = convertToChunkLocalCoordinate(x, z);
 
         Vector3f[] triangle = getTriangles(coordinate);
         float result = interpolateHeight(triangle[0], triangle[1], triangle[2], x, z);
-
         return result;
     }
 
@@ -79,7 +86,6 @@ public class Chunk extends GameItem {
                 getCoordinateInWorldScale(col + 1, true),
                 getWorldHeight(row, col + 1),
                 getCoordinateInWorldScale(row, false));
-//removed a * scale here
         if (getCoordinateInWorldScale(row, false)
                 < getDiagonalZCoord(triangle[1].x, triangle[1].z, triangle[2].x, triangle[2].z, getCoordinateInWorldScale(col, true))) {
             triangle[0] = new Vector3f(

@@ -1,20 +1,16 @@
 package org.lwjglb.engine;
 
-import org.joml.Vector3f;
 import org.lwjglb.engine.graph.Camera;
 import org.lwjglb.engine.services.Audio;
-import org.omg.CORBA.FloatHolder;
 
-import java.util.LinkedList;
 
-/**
- * @author Anton K.
- */
 public class Player {
     private Camera camera;
     private float playerHeight;
     private float lastTerrainHeight;
-    private final float MAX_DIFFERENCE = 0.09f;
+    private final float STEP_THRESHOLD = 0.09f;
+
+    private int stopCounter = 0;
 
     private Audio.Playable stepSound;
     private Audio audio;
@@ -29,43 +25,42 @@ public class Player {
 
     public Player(Camera camera) {
         this.camera = camera;
-        stepSound = Audio.getInstance().createPlayable("/audio/long_steps.ogg");
-        stepSound.setGain(0.1f);
+        audio = Audio.getInstance();
+        stepSound = audio.createPlayable("/audio/long_steps.ogg",true);
+        stepSound.setGain(0.03f);
         lastTerrainHeight = 0;
-        playerHeight = 2f;
-        audio=Audio.getInstance();
+
     }
 
-    public void move(float x, float z, float terrainHeightAtNewPosition) {
-        boolean moved = false;
-        //affects only climibng
-        if ((terrainHeightAtNewPosition - lastTerrainHeight) > MAX_DIFFERENCE && lastTerrainHeight != 0)
-            System.out.println("w");
-        else {
+    public void updatePosition(float x, float z, float terrainHeightAtNewPosition) {
 
+        //See if the player can make the step. Affects only climbing
+        boolean cantMove = ((terrainHeightAtNewPosition - lastTerrainHeight) > STEP_THRESHOLD && lastTerrainHeight != 0);
+        //update player position when a step is possible
+        if (!cantMove) {
             float y = terrainHeightAtNewPosition + playerHeight;
-            moved = true;
             lastTerrainHeight = terrainHeightAtNewPosition;
             camera.movePosition(x, 0, z);
-
             camera.getPosition().y = y;
-            audio.setListenerPosition(camera.getPosition());
-            System.out.println(camera.getPosition());
         }
-//TODO check if its better with play and resume
-        if (i > 10) {
-            stepSound.stop();
-        }
-        System.out.println(i);
-        if ((Utils.isZero(z, 0.0001f) && Utils.isZero(x, 0.0001f) )|| !moved) {
-            i++;
-            return;
-        }
-        i = 0;
-        stepSound.playIfNotAlreadyPlaying();
-
+        updateAudio(x, z, cantMove);
 
     }
 
-    private int i = 0;
+    private void updateAudio(float xStep, float zStep, boolean cantMove) {
+        audio.setListenerPosition(camera.getPosition());
+        audio.setListenerOrientation(camera.getRotation(), camera.getPosition());
+
+        //stop playing if the player was still for 10 ticks
+        //TODO modify ogg file and use pause instead of stop. Might be better
+        if (stopCounter > 10)
+            stepSound.stop();
+        //tick if there was no change in neither x nor z direction
+        if ((Utils.isZero(zStep, 0.0001f) && Utils.isZero(xStep, 0.0001f)) || cantMove) {
+            stopCounter++;
+        } else {
+            stopCounter = 0;
+            stepSound.playIfNotAlreadyPlaying();
+        }
+    }
 }

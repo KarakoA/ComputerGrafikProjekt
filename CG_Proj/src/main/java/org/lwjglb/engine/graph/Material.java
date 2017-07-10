@@ -1,7 +1,7 @@
 package org.lwjglb.engine.graph;
 
 import org.joml.Vector4f;
-
+//TODO remove this class entirely, only ambient colour used(and that's enough..) will save ~ 200 LoC
 public class Material {
 
     private static final Vector4f DEFAULT_COLOUR = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -18,7 +18,7 @@ public class Material {
 
     public Material() {
         this.ambientColour = DEFAULT_COLOUR;
-        this.diffuseColour = DEFAULT_COLOUR;
+        this.diffuseColour = new Vector4f(0.5f,0.5f,0.5f,0.5f);
         this.specularColour = DEFAULT_COLOUR;
         this.texture = null;
         this.reflectance = 0;
@@ -33,7 +33,7 @@ public class Material {
     }
 
     public Material(Texture texture, float reflectance) {
-        this(DEFAULT_COLOUR, DEFAULT_COLOUR, DEFAULT_COLOUR, texture, reflectance);
+        this(DEFAULT_COLOUR, DEFAULT_COLOUR,  DEFAULT_COLOUR, texture, reflectance);
     }
 
     public Material(Vector4f ambientColour, Vector4f diffuseColour, Vector4f specularColour, Texture texture, float reflectance) {
@@ -42,6 +42,7 @@ public class Material {
         this.specularColour = specularColour;
         this.texture = texture;
         this.reflectance = reflectance;
+
     }
 
     public Vector4f getAmbientColour() {
@@ -55,25 +56,12 @@ public class Material {
     public Vector4f getDiffuseColour() {
         return diffuseColour;
     }
-
-    public void setDiffuseColour(Vector4f diffuseColour) {
-        this.diffuseColour = diffuseColour;
-    }
-
     public Vector4f getSpecularColour() {
         return specularColour;
     }
 
-    public void setSpecularColour(Vector4f specularColour) {
-        this.specularColour = specularColour;
-    }
-
     public float getReflectance() {
         return reflectance;
-    }
-
-    public void setReflectance(float reflectance) {
-        this.reflectance = reflectance;
     }
 
     public boolean isTextured() {
@@ -88,4 +76,14 @@ public class Material {
         this.texture = texture;
     }
 
+    @Override
+    public String toString() {
+        return "Material{" +
+                "ambientColour=" + ambientColour +
+                ", diffuseColour=" + diffuseColour +
+                ", specularColour=" + specularColour +
+                ", reflectance=" + reflectance +
+                ", texture=" + texture +
+                '}';
+    }
 }

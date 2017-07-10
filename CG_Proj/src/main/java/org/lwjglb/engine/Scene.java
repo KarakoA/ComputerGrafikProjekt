@@ -5,15 +5,16 @@ import org.lwjglb.engine.items.GameItem;
 
 import java.util.*;
 
+/**
+ * Represents a scene
+ */
 public class Scene {
 
     private Collection<GameItem> gameItems;
 
     private SkyBox skyBox;
-    
+
     private SceneLight sceneLight;
-
-
 
     public Collection<GameItem> getGameItems() {
         return new ArrayList<>(gameItems);

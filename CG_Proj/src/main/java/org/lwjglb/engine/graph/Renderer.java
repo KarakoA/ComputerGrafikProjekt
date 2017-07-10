@@ -1,19 +1,16 @@
 package org.lwjglb.engine.graph;
 
-import org.lwjglb.engine.graph.lights.SpotLight;
-import org.lwjglb.engine.graph.lights.PointLight;
 import org.lwjglb.engine.graph.lights.DirectionalLight;
 
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import static org.lwjgl.opengl.GL11.*;
 
-import org.lwjglb.engine.items.Chunk;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.stb.STBEasyFont.stb_easy_font_print;
+
 import org.lwjglb.engine.items.GameItem;
 import org.lwjglb.engine.IHud;
 import org.lwjglb.engine.Scene;
@@ -32,10 +29,6 @@ public class Renderer {
     private static final float Z_NEAR = 0.01f;
 
     private static final float Z_FAR = 100f;
-
-    private static final int MAX_POINT_LIGHTS = 5;
-
-    private static final int MAX_SPOT_LIGHTS = 5;
 
     private final Transformation transformation;
 
@@ -56,6 +49,7 @@ public class Renderer {
         setupSkyBoxShader();
         setupSceneShader();
         setupHudShader();
+
     }
 
     private void setupSkyBoxShader() throws Exception {
@@ -87,8 +81,6 @@ public class Renderer {
         // Create lighting related uniforms
         sceneShaderProgram.createUniform("specularPower");
         sceneShaderProgram.createUniform("ambientLight");
-        sceneShaderProgram.createPointLightListUniform("pointLights", MAX_POINT_LIGHTS);
-        sceneShaderProgram.createSpotLightListUniform("spotLights", MAX_SPOT_LIGHTS);
         sceneShaderProgram.createDirectionalLightUniform("directionalLight");
     }
 
@@ -164,6 +156,7 @@ public class Renderer {
         Collection<GameItem> gameItems = scene.getGameItems();
         for (GameItem gameItem:gameItems){
             Mesh mesh=gameItem.getMesh();
+
             sceneShaderProgram.setUniform("material", mesh.getMaterial());
             Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(gameItem, viewMatrix);
             sceneShaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
@@ -178,41 +171,6 @@ public class Renderer {
         sceneShaderProgram.setUniform("ambientLight", sceneLight.getAmbientLight());
         sceneShaderProgram.setUniform("specularPower", specularPower);
 
-        // Process Point Lights
-        PointLight[] pointLightList = sceneLight.getPointLightList();
-        int numLights = pointLightList != null ? pointLightList.length : 0;
-        for (int i = 0; i < numLights; i++) {
-            // Get a copy of the point light object and transform its position to view coordinates
-            PointLight currPointLight = new PointLight(pointLightList[i]);
-            Vector3f lightPos = currPointLight.getPosition();
-            Vector4f aux = new Vector4f(lightPos, 1);
-            aux.mul(viewMatrix);
-            lightPos.x = aux.x;
-            lightPos.y = aux.y;
-            lightPos.z = aux.z;
-            sceneShaderProgram.setUniform("pointLights", currPointLight, i);
-        }
-
-        // Process Spot Ligths
-        SpotLight[] spotLightList = sceneLight.getSpotLightList();
-        numLights = spotLightList != null ? spotLightList.length : 0;
-        for (int i = 0; i < numLights; i++) {
-            // Get a copy of the spot light object and transform its position and cone direction to view coordinates
-            SpotLight currSpotLight = new SpotLight(spotLightList[i]);
-            Vector4f dir = new Vector4f(currSpotLight.getConeDirection(), 0);
-            dir.mul(viewMatrix);
-            currSpotLight.setConeDirection(new Vector3f(dir.x, dir.y, dir.z));
-
-            Vector3f lightPos = currSpotLight.getPointLight().getPosition();
-            Vector4f aux = new Vector4f(lightPos, 1);
-            aux.mul(viewMatrix);
-            lightPos.x = aux.x;
-            lightPos.y = aux.y;
-            lightPos.z = aux.z;
-
-            sceneShaderProgram.setUniform("spotLights", currSpotLight, i);
-        }
-
         // Get a copy of the directional light object and transform its position to view coordinates
         DirectionalLight currDirLight = new DirectionalLight(sceneLight.getDirectionalLight());
         Vector4f dir = new Vector4f(currDirLight.getDirection(), 0);
@@ -222,13 +180,14 @@ public class Renderer {
     }
 
     private void renderHud(Window window, IHud hud) {
+
         hudShaderProgram.bind();
 
         Matrix4f ortho = transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
         for (GameItem gameItem : hud.getGameItems()) {
             Mesh mesh = gameItem.getMesh();
             // Set ortohtaphic and model matrix for this HUD item
-            Matrix4f projModelMatrix = transformation.buildOrtoProjModelMatrix(gameItem, ortho);
+            Matrix4f projModelMatrix = transformation.buildModelViewMatrix(gameItem, ortho);
             hudShaderProgram.setUniform("projModelMatrix", projModelMatrix);
             hudShaderProgram.setUniform("colour", gameItem.getMesh().getMaterial().getAmbientColour());
             hudShaderProgram.setUniform("hasTexture", gameItem.getMesh().getMaterial().isTextured() ? 1 : 0);

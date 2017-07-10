@@ -3,12 +3,18 @@ package org.lwjglb.engine.items;
 import org.joml.Vector3f;
 import org.lwjglb.engine.graph.Mesh;
 
+/**
+ * The base class for all objects to be rendered.
+ * Holds a reference to a mesh(triangles,colours which can be rendered by open gl)
+ * and a scale,position(in degrees) and rotation which are used by the Transformation class
+ * to apply the according transformations for this object.
+ */
 public class GameItem {
 
     private Mesh mesh;
-    
+
     private final Vector3f position;
-    
+
     private float scale;
 
     private final Vector3f rotation;
@@ -18,7 +24,7 @@ public class GameItem {
         scale = 1;
         rotation = new Vector3f(0, 0, 0);
     }
-    
+
     public GameItem(Mesh mesh) {
         this();
         this.mesh = mesh;
@@ -51,11 +57,11 @@ public class GameItem {
         this.rotation.y = y;
         this.rotation.z = z;
     }
-    
+
     public Mesh getMesh() {
         return mesh;
     }
-    
+
     public void setMesh(Mesh mesh) {
         this.mesh = mesh;
     }

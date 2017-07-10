@@ -2,19 +2,17 @@ package org.lwjglb.engine;
 
 import org.joml.Vector3f;
 import org.lwjglb.engine.graph.lights.DirectionalLight;
-import org.lwjglb.engine.graph.lights.PointLight;
-import org.lwjglb.engine.graph.lights.SpotLight;
 
+/**
+ * Represents the light of the scene. 3 Types of lighting are used and configurable:
+ * skyBoxLight, for the skybox. Ambient for the other parts of the scene and Directional for the sun.
+ */
 public class SceneLight {
 
     private Vector3f ambientLight;
-    
+
     private Vector3f skyBoxLight;
 
-    private PointLight[] pointLightList;
-    
-    private SpotLight[] spotLightList;
-    
     private DirectionalLight directionalLight;
 
     public Vector3f getAmbientLight() {
@@ -23,22 +21,6 @@ public class SceneLight {
 
     public void setAmbientLight(Vector3f ambientLight) {
         this.ambientLight = ambientLight;
-    }
-
-    public PointLight[] getPointLightList() {
-        return pointLightList;
-    }
-
-    public void setPointLightList(PointLight[] pointLightList) {
-        this.pointLightList = pointLightList;
-    }
-
-    public SpotLight[] getSpotLightList() {
-        return spotLightList;
-    }
-
-    public void setSpotLightList(SpotLight[] spotLightList) {
-        this.spotLightList = spotLightList;
     }
 
     public DirectionalLight getDirectionalLight() {
@@ -56,5 +38,5 @@ public class SceneLight {
     public void setSkyBoxLight(Vector3f skyBoxLight) {
         this.skyBoxLight = skyBoxLight;
     }
-    
+
 }

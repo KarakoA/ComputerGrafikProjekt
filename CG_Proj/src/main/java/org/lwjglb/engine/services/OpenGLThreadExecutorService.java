@@ -33,7 +33,6 @@ public class OpenGLThreadExecutorService {
         return Thread.currentThread().getName().equals(GameEngine.OPENGL_THREAD_NAME);
     }
 
-
     public Collection<FutureTask> tasksToExecute() {
         List<FutureTask> toReturn = queue;
         queue = new LinkedList<>();

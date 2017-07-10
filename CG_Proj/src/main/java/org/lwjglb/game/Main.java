@@ -6,17 +6,15 @@ import org.lwjglb.engine.IGameLogic;
 import java.io.IOException;
 
 public class Main {
- 
-    public static void main(String[] args) throws IOException{
+
+    public static void main(String[] args) throws IOException {
         try {
-            boolean vSync = true;
             IGameLogic gameLogic = new DummyGame();
-            GameEngine gameEng = new GameEngine("GAME", vSync, gameLogic);
-            gameEng.start();
+            GameEngine gameEng = new GameEngine("GAME", gameLogic);
+            new Thread(gameEng, GameEngine.OPENGL_THREAD_NAME).start();
         } catch (Exception excp) {
             excp.printStackTrace();
             System.exit(-1);
         }
     }
-
 }

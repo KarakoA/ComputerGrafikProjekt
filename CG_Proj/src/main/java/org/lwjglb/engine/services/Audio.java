@@ -1,24 +1,29 @@
 package org.lwjglb.engine.services;
 
-import org.joml.Vector3f;
+import org.joml.*;
+import org.joml.Math;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALCCapabilities;
 import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.system.MemoryStack;
 import org.lwjglb.engine.graph.Texture;
+import org.lwjglb.engine.graph.Transformation;
+import org.lwjglb.game.DummyGame;
 
 import java.net.URISyntaxException;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import static org.lwjgl.openal.AL10.*;
 import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.stb.STBVorbis.stb_vorbis_decode_filename;
 
 import static org.lwjgl.system.libc.LibCStdlib.free;
+import static org.lwjglb.game.DummyGame.TERRAIN_SCALE;
 
 /**
  * Audio utility class. Plays ogg files using openAL.
@@ -62,8 +67,31 @@ public class Audio {
         alListener3f(AL_POSITION, position.x, position.y, position.z);
     }
 
+    public void setListenerOrientation(Vector3f rotationInDegree, Vector3f position) {
+        Matrix4f cameraMatrix = new Matrix4f();
+        Transformation.updateGenericViewMatrix(position, rotationInDegree, cameraMatrix);
+
+        Vector3f at = new Vector3f();
+        cameraMatrix.positiveZ(at).negate();
+        Vector3f up = new Vector3f();
+        cameraMatrix.positiveY(up);
+
+        alListenerfv(AL_ORIENTATION, new float[]{at.x, at.y, at.z, up.x, up.y, up.z});
+        float[] out = new float[6];
+        alGetListenerfv(AL_ORIENTATION, out);
+
+        int error = alGetError();
+        if (error == AL_INVALID_VALUE || error == AL_INVALID_ENUM || error == AL_INVALID_OPERATION) {
+            throw new RuntimeException("Error");
+        }
+    }
+
     public Playable createPlayable(String fileName) {
-        return new Playable(fileName);
+        return createPlayable(fileName, false);
+    }
+
+    public Playable createPlayable(String fileName, boolean relative) {
+        return new Playable(fileName, relative);
     }
 
     public class Playable implements AutoCloseable {
@@ -72,7 +100,11 @@ public class Audio {
         private int bufferPointer;
         private long durationInMiliSeconds;
 
-        private Playable(String fileName) throws RuntimeException {
+        public long getDurationInMiliSeconds() {
+            return durationInMiliSeconds;
+        }
+
+        private Playable(String fileName, boolean relative) throws RuntimeException {
             //get the correct absolute fileName
             Path p;
             try {
@@ -107,7 +139,7 @@ public class Audio {
                 format = AL_FORMAT_MONO16;
             } else if (channels == 2) {
                 format = AL_FORMAT_STEREO16;
-                System.err.println("Warning Audio is in stereo format. Cannot fade with distance.");
+                System.err.println("Warning " + fileName + " is in stereo format. Cannot fade with distance.");
             }
 
             //Request space for the buffer
@@ -123,6 +155,8 @@ public class Audio {
 
             //Assign the sound we just loaded to the source
             alSourcei(sourcePointer, AL_BUFFER, bufferPointer);
+            if (relative)
+                alSourcei(sourcePointer, AL_SOURCE_RELATIVE, AL_TRUE);
             durationInMiliSeconds = computeDuration();
         }
 
@@ -136,7 +170,7 @@ public class Audio {
 
             float result = (float) lengthInSamples / (float) frequency;
 
-            return (long)(result*1000L);
+            return (long) (result * 1000L);
         }
 
         @Override
@@ -167,18 +201,22 @@ public class Audio {
             if (state != AL_PLAYING)
                 this.play();
         }
-        //0-1 float
-        public void setGain(float gain){
-            if(gain < 0)
-                gain=0;
-            if (gain>1)
-                gain=1;
-            alSourcef(sourcePointer,AL_GAIN,gain);
+
+        public void setGain(float gain) {
+            //clip to 0-1
+            gain = Float.max(1, Float.min(0, gain));
+            alSourcef(sourcePointer, AL_GAIN, gain);
         }
-        public void testVelocityAndGain(){
-           // alSourcei(sourcePointer, AL_REFERENCE_DISTANCE, 1.0f);
-            // alSourcei(sourcePointer,AL_GAIN,0);
-            alSourcei(sourcePointer, AL_MAX_DISTANCE, 10);
+
+        public void enableSourceSoundDecrease() {
+            alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
+            //if the distance is smaller than this always maximum sound
+            alSourcei(sourcePointer, AL_REFERENCE_DISTANCE, TERRAIN_SCALE);
+            alSourcef(sourcePointer, AL_MIN_GAIN, 0.05f);
+            //beyond this all sounds the same
+            alSourcei(sourcePointer, AL_MAX_DISTANCE, TERRAIN_SCALE * 6);
+            //factor * distance
+            alSourcei(sourcePointer, AL_ROLLOFF_FACTOR, 5);
         }
     }
 }

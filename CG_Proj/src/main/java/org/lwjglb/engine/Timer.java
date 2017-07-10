@@ -1,9 +1,12 @@
 package org.lwjglb.engine;
 
+/**
+ * Utility class for measuring elapsed time between loops in the game loop.
+ */
 public class Timer {
 
     private double lastLoopTime;
-    
+
     public void init() {
         lastLoopTime = getTime();
     }
@@ -17,9 +20,5 @@ public class Timer {
         float elapsedTime = (float) (time - lastLoopTime);
         lastLoopTime = time;
         return elapsedTime;
-    }
-
-    public double getLastLoopTime() {
-        return lastLoopTime;
     }
 }

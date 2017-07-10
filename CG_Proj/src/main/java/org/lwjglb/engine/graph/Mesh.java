@@ -5,11 +5,13 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
+
 import org.lwjgl.system.MemoryUtil;
 import org.lwjglb.engine.items.GameItem;
 
@@ -22,6 +24,7 @@ public class Mesh {
     private final int vertexCount;
 
     private Material material;
+
 
     public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices) {
         FloatBuffer posBuffer = null;
@@ -110,7 +113,7 @@ public class Mesh {
             // Activate firs texture bank
             glActiveTexture(GL_TEXTURE0);
             // Bind the texture
-            glBindTexture(GL_TEXTURE_2D, texture.getId());
+            texture.bind();
         }
 
         // Draw the mesh
@@ -134,28 +137,17 @@ public class Mesh {
         initRender();
 
         glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
-
         endRender();
     }
 
     public void cleanUp() {
-        glDisableVertexAttribArray(0);
-
-        // Delete the VBOs
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        for (int vboId : vboIdList) {
-            glDeleteBuffers(vboId);
-        }
-
         // Delete the texture
         Texture texture = material.getTexture();
         if (texture != null) {
             texture.cleanup();
         }
-
-        // Delete the VAO
-        glBindVertexArray(0);
-        glDeleteVertexArrays(vaoId);
+        // Delete the VAO and VBOs
+        deleteBuffers();
     }
 
     public void deleteBuffers() {

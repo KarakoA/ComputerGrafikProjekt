@@ -12,11 +12,6 @@ public class Camera {
         position = new Vector3f(0, 0, 0);
         rotation = new Vector3f(0, 0, 0);
     }
-    
-    public Camera(Vector3f position, Vector3f rotation) {
-        this.position = position;
-        this.rotation = rotation;
-    }
 
     public Vector3f getPosition() {
         return position;
@@ -40,6 +35,7 @@ public class Camera {
         result.y += offsetY;
         return result;
     }
+    //TODO consider an update method using position.smoothStep()
     public void movePosition(float offsetX, float offsetY, float offsetZ) {
         if ( offsetZ != 0 ) {
             position.x += (float)Math.sin(Math.toRadians(rotation.y)) * -1.0f * offsetZ;
@@ -55,16 +51,11 @@ public class Camera {
     public Vector3f getRotation() {
         return rotation;
     }
-    
-    public void setRotation(float x, float y, float z) {
-        rotation.x = x;
-        rotation.y = y;
-        rotation.z = z;
-    }
 
     public void moveRotation(float offsetX, float offsetY, float offsetZ) {
         rotation.x += offsetX;
         rotation.y += offsetY;
         rotation.z += offsetZ;
     }
+
 }

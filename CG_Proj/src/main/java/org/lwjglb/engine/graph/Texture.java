@@ -2,8 +2,10 @@ package org.lwjglb.engine.graph;
 
 import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
+
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
@@ -35,7 +37,7 @@ public class Texture {
         // Create a new OpenGL texture 
         this.id = glGenTextures();
         // Bind the texture
-        glBindTexture(GL_TEXTURE_2D, this.id);
+        bind();
 
         // Tell OpenGL how to unpack the RGBA bytes. Each component is 1 byte size
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -44,7 +46,7 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         // Upload the texture data
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this.width, this.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-        // Generate Mip Map
+        // Generate Mip Map. Used for images with a smaller scale
         glGenerateMipmap(GL_TEXTURE_2D);
     }
 
@@ -60,8 +62,8 @@ public class Texture {
         glBindTexture(GL_TEXTURE_2D, id);
     }
 
-    public int getId() {
-        return id;
+    public void unbind() {
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     public void cleanup() {

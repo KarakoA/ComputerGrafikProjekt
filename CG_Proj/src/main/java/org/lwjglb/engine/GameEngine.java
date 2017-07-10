@@ -5,43 +5,32 @@ import org.lwjglb.engine.services.OpenGLThreadExecutorService;
 
 import java.util.concurrent.FutureTask;
 
+/**
+ * The Game Engine. Executes the game loop.
+ */
 public class GameEngine implements Runnable {
-
+    /**
+     * Used to identify the thread with the open gl context.
+     */
     public static String OPENGL_THREAD_NAME = "OpenGLMainThread";
 
-    public static final int TARGET_FPS = 75;
-
+    /**
+     * Updates per second.
+     */
     public static final int TARGET_UPS = 30;
 
     private final Window window;
-
-    private final Thread gameLoopThread;
-
     private final Timer timer;
-
     private final IGameLogic gameLogic;
-
     private final MouseInput mouseInput;
+    private final Audio audio;
 
-    public GameEngine(String windowTitle, boolean vSync, IGameLogic gameLogic) throws Exception {
-        this(windowTitle, 0, 0, vSync, gameLogic);
-    }
-    
-    public GameEngine(String windowTitle, int width, int height, boolean vSync, IGameLogic gameLogic) throws Exception {
-        gameLoopThread = new Thread(this,OPENGL_THREAD_NAME);
-        window = new Window(windowTitle, width, height, vSync);
+    public GameEngine(String windowTitle,IGameLogic gameLogic) throws Exception {
+        window = new Window(windowTitle);
         mouseInput = new MouseInput();
         this.gameLogic = gameLogic;
         timer = new Timer();
-    }
-
-    public void start() {
-        String osName = System.getProperty("os.name");
-        if ( osName.contains("Mac") ) {
-            gameLoopThread.run();
-        } else {
-            gameLoopThread.start();
-        }
+        audio = Audio.getInstance();
     }
 
     @Override
@@ -49,19 +38,20 @@ public class GameEngine implements Runnable {
         try {
             init();
             gameLoop();
-        } catch (Exception excp) {
-            excp.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             cleanup();
         }
     }
 
     protected void init() throws Exception {
-        Audio.getInstance().init();
+        audio.init();
         window.init();
         timer.init();
         mouseInput.init(window);
         gameLogic.init(window);
+
     }
 
     protected void gameLoop() {
@@ -69,8 +59,7 @@ public class GameEngine implements Runnable {
         float accumulator = 0f;
         float interval = 1f / TARGET_UPS;
 
-        boolean running = true;
-        while (running && !window.windowShouldClose()) {
+        while (!window.windowShouldClose()) {
             elapsedTime = timer.getElapsedTime();
             accumulator += elapsedTime;
 
@@ -82,37 +71,16 @@ public class GameEngine implements Runnable {
             }
             runSubmittedTasksOnOpenGlThread();
             render();
-
-            if ( !window.isvSync() ) {
-                sync();
-            }
-        }
-    }
-
-
-    protected void cleanup() {
-
-        Audio.getInstance().cleanup();
-        gameLogic.cleanup();
-    }
-    
-    private void sync() {
-        float loopSlot = 1f / TARGET_FPS;
-        double endTime = timer.getLastLoopTime() + loopSlot;
-        while (timer.getTime() < endTime) {
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException ie) {
-            }
         }
     }
 
     protected void input() {
-        mouseInput.input(window);
+        mouseInput.input();
         gameLogic.input(window, mouseInput);
     }
-    protected void runSubmittedTasksOnOpenGlThread(){
-        OpenGLThreadExecutorService executorService =OpenGLThreadExecutorService.getInstance();
+
+    protected void runSubmittedTasksOnOpenGlThread() {
+        OpenGLThreadExecutorService executorService = OpenGLThreadExecutorService.getInstance();
         executorService.tasksToExecute().forEach(FutureTask::run);
     }
 
@@ -123,5 +91,10 @@ public class GameEngine implements Runnable {
     protected void render() {
         gameLogic.render(window);
         window.update();
+    }
+
+    protected void cleanup() {
+        audio.cleanup();
+        gameLogic.cleanup();
     }
 }
