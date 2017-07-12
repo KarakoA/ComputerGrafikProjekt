@@ -154,8 +154,8 @@ public class Renderer {
         sceneShaderProgram.setUniform("texture_sampler", 0);
         // Render each mesh with the associated game Items
         Collection<GameItem> gameItems = scene.getGameItems();
-        for (GameItem gameItem:gameItems){
-            Mesh mesh=gameItem.getMesh();
+        for (GameItem gameItem : gameItems) {
+            Mesh mesh = gameItem.getMesh();
 
             sceneShaderProgram.setUniform("material", mesh.getMaterial());
             Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(gameItem, viewMatrix);
@@ -163,6 +163,16 @@ public class Renderer {
 
             mesh.render();
         }
+        //TODO tmp remove bunny
+        Mesh mesh = scene.getMusicBox().getMesh();
+
+        sceneShaderProgram.setUniform("material", mesh.getMaterial());
+        Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(scene.getMusicBox(), viewMatrix);
+        sceneShaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+
+        mesh.render();
+
+
         sceneShaderProgram.unbind();
     }
 

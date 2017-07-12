@@ -16,6 +16,16 @@ public class Scene {
 
     private SceneLight sceneLight;
 
+    private GameItem musicBox;
+
+    public GameItem getMusicBox() {
+        return musicBox;
+    }
+
+    public void setMusicBox(GameItem musicBox) {
+        this.musicBox = musicBox;
+    }
+
     public Collection<GameItem> getGameItems() {
         return new ArrayList<>(gameItems);
     }

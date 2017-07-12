@@ -64,14 +64,15 @@ public class Terrain {
         Random r = ThreadLocalRandom.current();
         float chunkLocalX = r.nextInt(CHUNK_SIZE) / (float) CHUNK_SIZE;
         float chunkLocalZ = r.nextInt(CHUNK_SIZE) / (float) CHUNK_SIZE;
-        float y = chunkWithMusicBox.getHeightFromChunkLocalCoordinates(chunkLocalX, chunkLocalZ);
-        return new Vector3f(chunkCoordinates.x + chunkLocalX, y, chunkCoordinates.y + chunkLocalZ);
+        float y = chunkWithMusicBox.getHeightEasyWay(chunkLocalX, chunkLocalZ);
+        //float y = chunkWithMusicBox.getHeightFromChunkLocalCoordinates(chunkLocalX, chunkLocalZ);
+        return new Vector3f(chunkCoordinates.x*terrainScale + chunkLocalX, y, chunkCoordinates.y*terrainScale + chunkLocalZ);
     }
 
     private Vector2i generateBoxChunkCoordinates(float terrainScale, float cameraStepSize, float songLengthInMiliSeconds) {
         float songLengthInSeconds = songLengthInMiliSeconds / 1000;
         //we assume the user can press a direction button 5 times per second at maximum
-        float maxDistancePerSecond = terrainScale * cameraStepSize * 5;
+        float maxDistancePerSecond = terrainScale * cameraStepSize;
         float maximumDistanceInStraightLineForSongDuration = maxDistancePerSecond * songLengthInSeconds;
         int maxChunk = (int) (MUSIC_BOX_DISTANCE_FACTOR * maximumDistanceInStraightLineForSongDuration / terrainScale);
 
@@ -108,9 +109,9 @@ public class Terrain {
 
         private Chunk createChunk(Vector2i chunkPosition) {
 //            float[][] heightMap = generator.generate(chunkPosition.y * (CHUNK_SIZE - 1), chunkPosition.x * (CHUNK_SIZE - 1), CHUNK_SIZE, CHUNK_SIZE);
-           // HeightMapMesh heightMapMesh = new HeightMapMesh(minY, maxY, heightMap, texture, textInc);
-            float[][] heightMap = generator.generate(chunkPosition.y * (CHUNK_SIZE - 1)-1, chunkPosition.x * (CHUNK_SIZE - 1)-1, CHUNK_SIZE+2, CHUNK_SIZE+2);
-             HeightMapMesh heightMapMesh = new HeightMapMesh(minY, maxY, heightMap,CHUNK_SIZE,CHUNK_SIZE, texture, textInc);
+            // HeightMapMesh heightMapMesh = new HeightMapMesh(minY, maxY, heightMap, texture, textInc);
+            float[][] heightMap = generator.generate(chunkPosition.y * (CHUNK_SIZE - 1) - 1, chunkPosition.x * (CHUNK_SIZE - 1) - 1, CHUNK_SIZE + 2, CHUNK_SIZE + 2);
+            HeightMapMesh heightMapMesh = new HeightMapMesh(minY, maxY, heightMap, CHUNK_SIZE, CHUNK_SIZE, texture, textInc);
             float xDisplacement = chunkPosition.x * scale;
             float zDisplacement = chunkPosition.y * scale;
 

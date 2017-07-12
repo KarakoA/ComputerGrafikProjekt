@@ -9,10 +9,10 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjglb.engine.GameEngine.TARGET_UPS;
 
 import org.lwjglb.engine.*;
-import org.lwjglb.engine.graph.Camera;
-import org.lwjglb.engine.graph.Renderer;
+import org.lwjglb.engine.graph.*;
 import org.lwjglb.engine.graph.lights.DirectionalLight;
 
+import org.lwjglb.engine.items.GameItem;
 import org.lwjglb.engine.items.SkyBox;
 import org.lwjglb.engine.items.Terrain;
 import org.lwjglb.engine.services.Audio;
@@ -70,10 +70,13 @@ public class DummyGame implements IGameLogic {
         //background music
         Audio audio = Audio.getInstance();
         backgroundMusic = audio.createPlayable("/audio/background/lailaihei_short.ogg");
+        //TODO position wrong calculated
         musicBoxPosition = terrain.getMusicBoxPosition(TERRAIN_SCALE, CAMERA_POS_STEP, backgroundMusic.getDurationInMiliSeconds());
+
         System.out.println("Music Box Location:");
-        System.out.println("X: "+musicBoxPosition.x);
-        System.out.println("Y: "+musicBoxPosition.z);
+        System.out.println("X: " + musicBoxPosition.x);
+        System.out.println("Y: " + musicBoxPosition.y);
+        System.out.println("Z: " + musicBoxPosition.z);
         backgroundMusic.setPosition(musicBoxPosition);
         backgroundMusic.play();
         backgroundMusic.enableSourceSoundDecrease();
@@ -86,6 +89,14 @@ public class DummyGame implements IGameLogic {
         scene.setGameItems(terrain.getGameItems());
         player = new Player(new Camera());
         player.setPlayerHeight(playerHeight);
+
+        // "Music Box"
+        Mesh mesh = OBJLoader.loadMesh("/models/bunny.obj");
+        mesh.setMaterial(new Material(new Texture("/textures/rainbow.png")));
+        GameItem musicBox = new GameItem(mesh);
+        musicBox.setScale(0.3f);
+        musicBox.setPosition(musicBoxPosition.x, musicBoxPosition.y, musicBoxPosition.z);
+        scene.setMusicBox(musicBox);
 
         // Setup  SkyBox
         SkyBox skyBox = new SkyBox("/models/skybox.obj", "/textures/skybox.png");
@@ -145,15 +156,14 @@ public class DummyGame implements IGameLogic {
 
         }
         if (window.isKeyPressed(GLFW_KEY_L)) {
-            lightAngle += 0.8f;
+            DebugHardcodedTestEndBoolean = true;
         }
         if (window.isKeyPressed(GLFW_KEY_K)) {
             scene.getSceneLight().getDirectionalLight().setColor(new Vector3f(255, 0, 0));
             scene.getSceneLight().setAmbientLight(new Vector3f(255, 0, 0));
         }
         if (window.isKeyPressed(GLFW_KEY_G)) {
-            // DebugHardcodedTestEndBoolean = true;
-            //  won = true;
+
             Vector3f cameraPosition = player.getCamera().getPosition();
             Vector2f musicBoxXZ = new Vector2f(musicBoxPosition.x, musicBoxPosition.z);
             Vector2f cameraXZ = new Vector2f(cameraPosition.x, cameraPosition.z);
@@ -164,10 +174,10 @@ public class DummyGame implements IGameLogic {
             System.out.println(String.format("X: %.2f", player.getCamera().getPosition().x));
             System.out.println("Y(Height): " + player.getCamera().getPosition().y + "");
             System.out.println(String.format("Z: %.2f", player.getCamera().getPosition().z));
-          //  Vector2i newChunk = determineNewChunk();
-         //   System.out.println("Chunk: " + newChunk);
+            //  Vector2i newChunk = determineNewChunk();
+            //   System.out.println("Chunk: " + newChunk);
 
-         //   System.out.println("Looking At: " + player.getCamera().getRotation());
+            //   System.out.println("Looking At: " + player.getCamera().getRotation());
             System.out.println();
         }
 

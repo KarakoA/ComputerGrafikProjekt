@@ -169,7 +169,6 @@ public class Audio {
             int frequency = alGetBufferi(bufferPointer, AL_FREQUENCY);
 
             float result = (float) lengthInSamples / (float) frequency;
-
             return (long) (result * 1000L);
         }
 

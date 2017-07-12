@@ -1,6 +1,5 @@
 package org.lwjglb.engine.items;
 
-import javafx.util.Pair;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
@@ -32,6 +31,13 @@ public class Chunk extends GameItem {
         Vector2i[] res = new Vector2i[]{new Vector2i(x, y - 1), new Vector2i(x, y + 1), new Vector2i(x + 1, y), new Vector2i(x + 1, y + 1), new Vector2i(x + 1, y - 1),
                 new Vector2i(x - 1, y), new Vector2i(x - 1, y - 1), new Vector2i(x - 1, y + 1)};
         return Arrays.asList(res);
+    }
+//x and z local coords
+    public float getHeightEasyWay(float x, float z) {
+        int xI=toHeightMapIndex(x);
+        int zI=toHeightMapIndex(z);
+
+        return getWorldHeight(xI,zI);
     }
 
     public float getHeightFromChunkLocalCoordinates(float x, float z) {
