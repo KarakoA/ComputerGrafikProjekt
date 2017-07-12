@@ -91,11 +91,10 @@ public class DummyGame implements IGameLogic {
         player.setPlayerHeight(playerHeight);
 
         // "Music Box"
-        Mesh mesh = OBJLoader.loadMesh("/models/bunny.obj");
-        mesh.setMaterial(new Material(new Texture("/textures/rainbow.png")));
-        GameItem musicBox = new GameItem(mesh);
+        
+        MusicBox musicBox = new MusicBox("models/tower/tower2.obj", "/models/tower");
         musicBox.setScale(0.3f);
-        musicBox.setPosition(musicBoxPosition.x, musicBoxPosition.y, musicBoxPosition.z);
+        musicBox.setPosition(musicBoxPosition.x, 3, musicBoxPosition.z);
         scene.setMusicBox(musicBox);
 
         // Setup  SkyBox

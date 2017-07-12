@@ -4,7 +4,7 @@ import org.joml.Vector4f;
 //TODO remove this class entirely, only ambient colour used(and that's enough..) will save ~ 200 LoC
 public class Material {
 
-    private static final Vector4f DEFAULT_COLOUR = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    public static final Vector4f DEFAULT_COLOUR = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     private Vector4f ambientColour;
 
