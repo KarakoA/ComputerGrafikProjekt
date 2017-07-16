@@ -63,9 +63,10 @@ public class DummyGame implements IGameLogic {
         float skyBoxScale = 50f;
         float minY = 0;
         float maxY = 0.3f;
-        float playerHeight = 0.25f;//0.001f;
+        float playerHeight = 0.80f;//0.001f;
         int textInc = 40;
         terrain = new Terrain(TERRAIN_SCALE, minY, maxY, "/textures/terrain.png", textInc);
+        //terrain = new Terrain(TERRAIN_SCALE, minY, maxY, "/textures/terrain-big.png", textInc);
 
         //background music
         Audio audio = Audio.getInstance();
@@ -94,11 +95,12 @@ public class DummyGame implements IGameLogic {
         
         MusicBox musicBox = new MusicBox("models/tower/tower2.obj", "/models/tower");
         musicBox.setScale(0.3f);
-        musicBox.setPosition(musicBoxPosition.x, 3, musicBoxPosition.z);
+        musicBox.setPosition(musicBoxPosition.x, 1, musicBoxPosition.z);
+        //musicBox.setPosition(0, 1, 0);
         scene.setMusicBox(musicBox);
 
         // Setup  SkyBox
-        SkyBox skyBox = new SkyBox("/models/skybox.obj", "/textures/skybox.png");
+        SkyBox skyBox = new SkyBox("models/skybox/skybox.obj", "/models/skybox");
         skyBox.setScale(skyBoxScale);
         scene.setSkyBox(skyBox);
 

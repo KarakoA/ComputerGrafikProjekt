@@ -164,14 +164,14 @@ public class Renderer {
             mesh.render();
         }
         //TODO tmp remove bunny
-        Mesh mesh = scene.getMusicBox().getMesh();
-
+        Mesh[] meshes = scene.getMusicBox().getMeshes();
+        for(Mesh mesh: meshes){
         sceneShaderProgram.setUniform("material", mesh.getMaterial());
         Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(scene.getMusicBox(), viewMatrix);
         sceneShaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
 
         mesh.render();
-
+        }
 
         sceneShaderProgram.unbind();
     }
