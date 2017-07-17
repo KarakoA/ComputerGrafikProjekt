@@ -24,7 +24,7 @@ public class HeightMapGenerator {
     private Vector2f[] octaveOffsets;
 
     //seed used only for octaves offsets
-    public HeightMapGenerator(int seed, float scale, int octaves, float frequencyFactor, float amplitudeFactor) {
+    public HeightMapGenerator(long seed, float scale, int octaves, float frequencyFactor, float amplitudeFactor) {
         this.scale = scale <= 0 ? 0.0001f : scale;
         this.octaves = octaves;
         this.frequencyFactor = frequencyFactor;

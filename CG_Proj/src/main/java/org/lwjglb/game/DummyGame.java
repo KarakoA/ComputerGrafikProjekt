@@ -12,7 +12,7 @@ import org.lwjglb.engine.*;
 import org.lwjglb.engine.graph.*;
 import org.lwjglb.engine.graph.lights.DirectionalLight;
 
-import org.lwjglb.engine.items.GameItem;
+import org.lwjglb.engine.items.MusicBox;
 import org.lwjglb.engine.items.SkyBox;
 import org.lwjglb.engine.items.Terrain;
 import org.lwjglb.engine.services.Audio;
@@ -30,10 +30,10 @@ public class DummyGame implements IGameLogic {
     private Scene scene;
     private Hud hud;
     private Terrain terrain;
+    private MusicBox musicBox;
 
     //sounds
-    private Audio.Playable backgroundMusic;
-    private Vector3f musicBoxPosition;
+    private long musicBoxDuration;
     private Audio.Playable loseSound;
     private Audio.Playable winSound;
     //time
@@ -49,9 +49,11 @@ public class DummyGame implements IGameLogic {
     private boolean won;
     private boolean controlsDisabled;
     private boolean DebugHardcodedTestEndBoolean;
+    private GameParameters parameters;
 
-    public DummyGame() {
+    public DummyGame(GameParameters parameters) {
         renderer = new Renderer();
+        this.parameters = parameters;
         cameraInc = new Vector3f(0.0f, 0.0f, 0.0f);
         start = System.currentTimeMillis();
     }
@@ -65,37 +67,34 @@ public class DummyGame implements IGameLogic {
         float maxY = 0.3f;
         float playerHeight = 0.25f;//0.001f;
         int textInc = 40;
-        terrain = new Terrain(TERRAIN_SCALE, minY, maxY, "/textures/terrain.png", textInc);
+        terrain = new Terrain(TERRAIN_SCALE, minY, maxY, "/textures/terrain.png",
+                textInc,parameters.getDifficulty().factor,parameters.getSeed() );
 
         //background music
         Audio audio = Audio.getInstance();
-        backgroundMusic = audio.createPlayable("/audio/background/lailaihei_short.ogg");
-        //TODO position wrong calculated
-        musicBoxPosition = terrain.getMusicBoxPosition(TERRAIN_SCALE, CAMERA_POS_STEP, backgroundMusic.getDurationInMiliSeconds());
 
-        System.out.println("Music Box Location:");
-        System.out.println("X: " + musicBoxPosition.x);
-        System.out.println("Y: " + musicBoxPosition.y);
-        System.out.println("Z: " + musicBoxPosition.z);
-        backgroundMusic.setPosition(musicBoxPosition);
-        backgroundMusic.play();
-        backgroundMusic.enableSourceSoundDecrease();
 
         //load the audio files in advance
-        loseSound = audio.createPlayable("/audio/lose.ogg", true);
-        winSound = audio.createPlayable("/audio/win.ogg", true);
+        loseSound = audio.createPlayable("/audio/evil_laugh.ogg", true);
+        winSound = audio.createPlayable("/audio/win_melody.ogg", true);
 
         scene = new Scene();
         scene.setGameItems(terrain.getGameItems());
         player = new Player(new Camera());
         player.setPlayerHeight(playerHeight);
 
-        // "Music Box"
-        
-        MusicBox musicBox = new MusicBox("models/tower/tower2.obj", "/models/tower");
+        // Music Box
+        musicBox = new MusicBox("models/tower/tower2.obj", "/models/tower", "/audio/background/lailaihei_short.ogg");
         musicBox.setScale(0.3f);
+        musicBoxDuration = musicBox.getBackgroundMusic().getDurationInMiliSeconds();
+        Vector3f musicBoxPosition = terrain.getMusicBoxPosition(TERRAIN_SCALE, CAMERA_POS_STEP, musicBoxDuration);
         musicBox.setPosition(musicBoxPosition.x, 3, musicBoxPosition.z);
         scene.setMusicBox(musicBox);
+
+        System.out.println("Music Box Location:");
+        System.out.println("X: " + musicBoxPosition.x);
+        System.out.println("Y: " + musicBoxPosition.y);
+        System.out.println("Z: " + musicBoxPosition.z);
 
         // Setup  SkyBox
         SkyBox skyBox = new SkyBox("/models/skybox.obj", "/textures/skybox.png");
@@ -107,7 +106,7 @@ public class DummyGame implements IGameLogic {
 
         //Setup Light Change cyle
         lightAngle = START_LIGHT_ANGLE;
-        long durationInSeconds = backgroundMusic.getDurationInMiliSeconds() / 1000;
+        long durationInSeconds = musicBoxDuration / 1000;
         angleUpdatePerCycle = (Math.abs(lightAngle) + MAX_LIGHT_ANGLE) / (durationInSeconds * (TARGET_UPS));
 
 
@@ -162,9 +161,8 @@ public class DummyGame implements IGameLogic {
             scene.getSceneLight().setAmbientLight(new Vector3f(255, 0, 0));
         }
         if (window.isKeyPressed(GLFW_KEY_G)) {
-
             Vector3f cameraPosition = player.getCamera().getPosition();
-            Vector2f musicBoxXZ = new Vector2f(musicBoxPosition.x, musicBoxPosition.z);
+            Vector2f musicBoxXZ = new Vector2f(musicBox.getPosition().x, musicBox.getPosition().z);
             Vector2f cameraXZ = new Vector2f(cameraPosition.x, cameraPosition.z);
             float distance = musicBoxXZ.distance(cameraXZ);
             System.out.println("Distance: " + distance);
@@ -173,10 +171,6 @@ public class DummyGame implements IGameLogic {
             System.out.println(String.format("X: %.2f", player.getCamera().getPosition().x));
             System.out.println("Y(Height): " + player.getCamera().getPosition().y + "");
             System.out.println(String.format("Z: %.2f", player.getCamera().getPosition().z));
-            //  Vector2i newChunk = determineNewChunk();
-            //   System.out.println("Chunk: " + newChunk);
-
-            //   System.out.println("Looking At: " + player.getCamera().getRotation());
             System.out.println();
         }
 
@@ -233,22 +227,23 @@ public class DummyGame implements IGameLogic {
 
     private boolean foundMusicBox() {
         Vector3f cameraPosition = player.getCamera().getPosition();
-        Vector2f musicBoxXZ = new Vector2f(musicBoxPosition.x, musicBoxPosition.z);
+        Vector2f musicBoxXZ = new Vector2f(musicBox.getPosition().x, musicBox.getPosition().z);
         Vector2f cameraXZ = new Vector2f(cameraPosition.x, cameraPosition.z);
         float distance = musicBoxXZ.distance(cameraXZ);
         won = distance < MINIMUM_WIN_DISTANCE;
+
         return won;
     }
 
     private boolean timeIsOver() {
         long now = System.currentTimeMillis();
         //1.05 of the duration for dramatic purposes. So there is a little bit with no music at the end
-        long gameDuration = (long) (backgroundMusic.getDurationInMiliSeconds() * 1.05);
+        long gameDuration = (long) (musicBoxDuration * 1.05);
         return now > start + gameDuration;
     }
 
     private void endGame() {
-        backgroundMusic.stop();
+        musicBox.getBackgroundMusic().stop();
         angleUpdatePerCycle = 0;
         controlsDisabled = true;
         SceneLight sceneLight = scene.getSceneLight();
@@ -299,7 +294,7 @@ public class DummyGame implements IGameLogic {
         directionalLight.getDirection().x = (float) Math.sin(angRad);
         directionalLight.getDirection().y = (float) Math.cos(angRad);
         if (lightAngle >= MAX_LIGHT_ANGLE) {
-            float step = 0.001f;
+            float step = 0.0005f;
             sceneLight.getAmbientLight().sub(new Vector3f(step, step, step)).max(new Vector3f(0.15f, 0.15f, 0.15f));
         }
     }

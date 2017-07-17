@@ -3,6 +3,7 @@ package org.lwjglb.game;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIColor4D;
@@ -13,7 +14,9 @@ import org.lwjgl.assimp.AIScene;
 import org.lwjgl.assimp.AIString;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
+
 import static org.lwjgl.assimp.Assimp.*;
+
 import org.lwjglb.engine.Utils;
 import org.lwjglb.engine.graph.Material;
 import org.lwjglb.engine.graph.Mesh;
@@ -24,7 +27,7 @@ public class StaticMeshesLoader {
     public static Mesh[] load(String resourcePath, String texturesDir) throws Exception {
         return load(resourcePath, texturesDir, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_FixInfacingNormals);
     }
-    
+
     public static Mesh[] load(String resourcePath, String texturesDir, int flags) throws Exception {
         AIScene aiScene = aiImportFile(resourcePath, flags);
         if (aiScene == null) {
@@ -79,7 +82,7 @@ public class StaticMeshesLoader {
         if (result == 0) {
             specular = new Vector4f(colour.r(), colour.g(), colour.b(), colour.a());
         }
-        
+
         Material material = new Material(ambient, diffuse, specular, texture, 1.0f);
         materials.add(material);
     }
@@ -95,10 +98,10 @@ public class StaticMeshesLoader {
         processTextCoords(aiMesh, textures);
         processIndices(aiMesh, indices);
 
-        Mesh mesh = new Mesh(Utils.listToArray(vertices),
-                Utils.listToArray(textures),
-                Utils.listToArray(normals),
-                Utils.listIntToArray(indices)
+        Mesh mesh = new Mesh(Utils.floatListToArray(vertices),
+                Utils.floatListToArray(textures),
+                Utils.floatListToArray(normals),
+                Utils.intListToArray(indices)
         );
         Material material;
         int materialIdx = aiMesh.mMaterialIndex();

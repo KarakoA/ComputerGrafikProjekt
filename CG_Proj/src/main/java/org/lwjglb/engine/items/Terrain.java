@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Terrain {
     public static final int CHUNK_SIZE = 256;
-    private final float MUSIC_BOX_DISTANCE_FACTOR = 0.75f;
+    private float musicBoxDistanceFactor;
     private final Map<Vector2i, Chunk> chunkPositionToChunksMap;
     private final ChunkUpdater updater;
 
@@ -35,10 +35,10 @@ public class Terrain {
         new Thread(updater).start();
     }
 
-    public Terrain(float scale, float minY, float maxY, String textureFile, int textInc) throws Exception {
+    public Terrain(float scale, float minY, float maxY, String textureFile, int textInc,
+                   float musicBoxDistanceFactor,long seed) throws Exception {
         chunkPositionToChunksMap = Collections.synchronizedMap(new HashMap<>());
-
-        int seed = 250;//150;
+        this.musicBoxDistanceFactor = musicBoxDistanceFactor;
         HeightMapGenerator generator = new HeightMapGenerator(seed, 150, 8, 2, 0.5f);
         //HeightMapGenerator generator = new HeightMapGenerator(seed, 150, 0, 2, 0.5f);
         Texture texture = new Texture(textureFile);
@@ -64,9 +64,8 @@ public class Terrain {
         Random r = ThreadLocalRandom.current();
         float chunkLocalX = r.nextInt(CHUNK_SIZE) / (float) CHUNK_SIZE;
         float chunkLocalZ = r.nextInt(CHUNK_SIZE) / (float) CHUNK_SIZE;
-        float y = chunkWithMusicBox.getHeightEasyWay(chunkLocalX, chunkLocalZ);
-        //float y = chunkWithMusicBox.getHeightFromChunkLocalCoordinates(chunkLocalX, chunkLocalZ);
-        return new Vector3f(chunkCoordinates.x*terrainScale + chunkLocalX, y, chunkCoordinates.y*terrainScale + chunkLocalZ);
+        float y = chunkWithMusicBox.getApproxHeight(chunkLocalX, chunkLocalZ);
+        return new Vector3f(chunkCoordinates.x * terrainScale + chunkLocalX, y, chunkCoordinates.y * terrainScale + chunkLocalZ);
     }
 
     private Vector2i generateBoxChunkCoordinates(float terrainScale, float cameraStepSize, float songLengthInMiliSeconds) {
@@ -74,7 +73,7 @@ public class Terrain {
         //we assume the user can press a direction button 5 times per second at maximum
         float maxDistancePerSecond = terrainScale * cameraStepSize;
         float maximumDistanceInStraightLineForSongDuration = maxDistancePerSecond * songLengthInSeconds;
-        int maxChunk = (int) (MUSIC_BOX_DISTANCE_FACTOR * maximumDistanceInStraightLineForSongDuration / terrainScale);
+        int maxChunk = (int) (musicBoxDistanceFactor * maximumDistanceInStraightLineForSongDuration / terrainScale);
 
         Random r = ThreadLocalRandom.current();
         int signX = r.nextInt() > 0 ? 1 : -1;

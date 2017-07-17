@@ -32,21 +32,13 @@ public class Chunk extends GameItem {
                 new Vector2i(x - 1, y), new Vector2i(x - 1, y - 1), new Vector2i(x - 1, y + 1)};
         return Arrays.asList(res);
     }
-//x and z local coords
-    public float getHeightEasyWay(float x, float z) {
-        int xI=toHeightMapIndex(x);
-        int zI=toHeightMapIndex(z);
 
-        return getWorldHeight(xI,zI);
-    }
+    //x and z local coordinates
+    public float getApproxHeight(float x, float z) {
+        int xI = toHeightMapIndex(x);
+        int zI = toHeightMapIndex(z);
 
-    public float getHeightFromChunkLocalCoordinates(float x, float z) {
-        Vector3f[] triangle = getTriangles(new Vector2f(x,z));
-        //convert to world
-        x=(x+chunkPosition.x)*getScale();
-        z=(z+chunkPosition.y)*getScale();
-        float result = interpolateHeight(triangle[0], triangle[1], triangle[2], x, z);
-        return result;
+        return getWorldHeight(xI, zI);
     }
 
     //returns the height in world coordinates of a given point in world coordinates which is within this chunk

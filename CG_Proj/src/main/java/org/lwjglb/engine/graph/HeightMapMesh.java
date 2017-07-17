@@ -7,15 +7,14 @@ import java.util.concurrent.FutureTask;
 import org.joml.Vector3f;
 import org.lwjglb.engine.Utils;
 import org.lwjglb.engine.services.OpenGLThreadExecutorService;
-import org.w3c.dom.Text;
 
 public class HeightMapMesh {
 
     private static final int MAX_COLOUR = 255 * 255 * 255;
 
-    private static final float STARTX = 0;//-0.5f;//-0.5f;
+    private static final float STARTX = 0;
 
-    private static final float STARTZ = 0;//-0.5f;//-0.5f;
+    private static final float STARTZ = 0;
 
     private final float minY;
 
@@ -33,8 +32,8 @@ public class HeightMapMesh {
 
         heights = new float[height][width];
 
-        float incx = getXLength() / (width - 1);
-        float incz = getZLength() / (height - 1);
+        float incx = 1f / (width - 1);
+        float incz = 1f/ (height - 1);
 
         List<Float> positions = new ArrayList<>();
         List<Float> textCoords = new ArrayList<>();
@@ -55,7 +54,6 @@ public class HeightMapMesh {
                 textCoords.add((float) textInc * (float) row / (float) height);
 
                 // Create indices
-
                 if (col < width - 1 && row < height - 1) {
                     int leftTop = row * width + col;
                     int leftBottom = (row + 1) * width + col;
@@ -72,9 +70,9 @@ public class HeightMapMesh {
                 }
             }
         }
-        float[] posArr = Utils.listToArray(positions);
+        float[] posArr = Utils.floatListToArray(positions);
         int[] indicesArr = indices.stream().mapToInt(i -> i).toArray();
-        float[] textCoordsArr = Utils.listToArray(textCoords);
+        float[] textCoordsArr = Utils.floatListToArray(textCoords);
         float[] normalsArr = calcNormals(width, height, heightMap);
 
         FutureTask<Mesh> task = new FutureTask<Mesh>(() -> {
@@ -103,18 +101,11 @@ public class HeightMapMesh {
         return mesh;
     }
 
-    public static float getXLength() {
-        return 1;
-        //return Math.abs(-STARTX * 2);
-    }
 
-    public static float getZLength() {
-        return 1;//Math.abs(-STARTZ * 2);
-    }
 
     private float[] calcNormals(int width, int height, float[][] heightMap) {
-        float incx = getXLength() / (width - 1);
-        float incz = getZLength() / (height - 1);
+        float incx = 1f / (width - 1);
+        float incz = 1f/ (height - 1);
 
         Vector3f v0 = new Vector3f();
         Vector3f v1 = new Vector3f();
@@ -174,7 +165,7 @@ public class HeightMapMesh {
                 normals.add(normal.z);
             }
         }
-        return Utils.listToArray(normals);
+        return Utils.floatListToArray(normals);
     }
 
     private float getHeight(float y) {
