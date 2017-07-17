@@ -1,12 +1,13 @@
 package org.lwjglb.game;
 
+import java.io.File;
+
 import org.joml.Vector4f;
 import org.lwjglb.engine.items.GameItem;
 import org.lwjglb.engine.IHud;
 import org.lwjglb.engine.Window;
 import org.lwjglb.engine.graph.Material;
 import org.lwjglb.engine.graph.Mesh;
-import org.lwjglb.engine.graph.OBJLoader;
 
 public class Hud implements IHud {
     private final GameItem[] gameItems;
@@ -15,11 +16,17 @@ public class Hud implements IHud {
 
     public Hud() throws Exception {
         // Create compass
-        Mesh mesh = OBJLoader.loadMesh("/models/compass.obj");
+        /*Mesh mesh = OBJLoader.loadMesh("/models/compass.obj");
         Material material = new Material();
         material.setAmbientColour(new Vector4f(1, 0, 0, 1));
         mesh.setMaterial(material);
-        compassItem = new GameItem(mesh);
+        compassItem = new GameItem(mesh);*/
+        String fileName = Thread.currentThread().getContextClassLoader()
+	              .getResource("models/compass/compass.obj").getFile();
+			File file = new File(fileName);
+			Mesh[] meshes = (StaticMeshesLoader.load(file.getAbsolutePath(), "/models/compass"));
+		compassItem = new GameItem(meshes);
+		compassItem.getMesh().getMaterial().setAmbientColour(new Vector4f(1, 0, 0, 1));
         compassItem.setScale(40.0f);
         // Rotate to transform it to screen coordinates
         compassItem.setRotation(0f, 0f, 180f);

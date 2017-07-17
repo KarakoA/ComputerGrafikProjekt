@@ -29,6 +29,10 @@ public class GameItem {
         this();
         this.meshes = new Mesh[]{mesh};
     }
+    public GameItem(Mesh[] meshes){
+    	this();
+    	this.meshes = meshes;
+    }
 
     public Vector3f getPosition() {
         return position;
