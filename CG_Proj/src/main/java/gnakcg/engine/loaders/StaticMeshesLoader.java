@@ -17,7 +17,7 @@ import org.lwjgl.assimp.Assimp;
 
 import static org.lwjgl.assimp.Assimp.*;
 
-import gnakcg.engine.Utils;
+import gnakcg.utils.Utils;
 import gnakcg.engine.graph.Material;
 import gnakcg.engine.graph.Mesh;
 import gnakcg.engine.graph.Texture;
@@ -115,7 +115,6 @@ public class StaticMeshesLoader {
             material = new Material();
         }
         mesh.setMaterial(material);
-        System.out.println(material);
         return mesh;
     }
 

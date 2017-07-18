@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         try {
             IGameLogic gameLogic = new Game(GameParameters.DEFAULT_PARAMETERS);
-            GameEngine gameEng = new GameEngine("GAME", gameLogic);
+            GameEngine gameEng = new GameEngine("", gameLogic);
             new Thread(gameEng, GameEngine.OPENGL_THREAD_NAME).start();
 
         } catch (Exception e) {

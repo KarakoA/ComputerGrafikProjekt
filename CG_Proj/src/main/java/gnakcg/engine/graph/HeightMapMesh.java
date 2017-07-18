@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.FutureTask;
 
+import org.joml.Vector2i;
 import org.joml.Vector3f;
-import gnakcg.engine.Utils;
+import gnakcg.utils.Utils;
 import gnakcg.engine.services.OpenGLThreadExecutorService;
 
 /**
@@ -99,6 +100,22 @@ public class HeightMapMesh {
         row = Integer.min(heights.length - 1, Integer.max(0, row));
         col = Integer.min(heights.length - 1, Integer.max(col, 0));
         return heights[row][col];
+    }
+
+    public Vector2i getMinimumHeightCoordinates() {
+        float minHeight = Integer.MAX_VALUE;
+        Vector2i minHeightI = new Vector2i(0, 0);
+        for (int row = 0; row < heights.length; row++) {
+            for (int col = 0; col < heights[0].length; col++) {
+                float currentHeight = heights[row][col];
+                if (currentHeight < minHeight) {
+                    minHeight = currentHeight;
+                    minHeightI.x = row;
+                    minHeightI.y = col;
+                }
+            }
+        }
+        return minHeightI;
     }
 
     public Mesh getMesh() {

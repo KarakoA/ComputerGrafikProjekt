@@ -1,10 +1,8 @@
 package gnakcg.game;
 
-import java.io.File;
-import java.nio.file.Paths;
-
 import gnakcg.engine.IHud;
-import gnakcg.engine.Utils;
+import gnakcg.utils.ResourceLoader;
+import gnakcg.utils.Utils;
 import gnakcg.engine.Window;
 import gnakcg.engine.graph.Mesh;
 import gnakcg.engine.items.GameItem;
@@ -22,7 +20,7 @@ public class Hud implements IHud {
 
     public Hud() throws Exception {
         // Create compass
-        String path = Utils.getResourceAbsolutePath("/models/compass/compass.obj");
+        String path = ResourceLoader.getInstance().getResourcePath("/models/compass/compass.obj");
         Mesh[] meshes = (StaticMeshesLoader.load(path, "/models/compass"));
         compassItem = new GameItem(meshes);
         compassItem.getMesh().getMaterial().setAmbientColour(new Vector4f(1, 0, 0, 1));

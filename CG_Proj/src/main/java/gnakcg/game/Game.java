@@ -45,8 +45,8 @@ public class Game implements IGameLogic {
     //light
     private float lightAngle;
     private float angleUpdatePerCycle;
-    private final int START_LIGHT_ANGLE = -100;
-    private final int MAX_LIGHT_ANGLE = 100;
+    private final int START_LIGHT_ANGLE = -90;
+    private final int MAX_LIGHT_ANGLE = 80;
 
     //state variables
     private boolean won;
@@ -76,7 +76,6 @@ public class Game implements IGameLogic {
         //background music
         Audio audio = Audio.getInstance();
 
-
         //load the audio files in advance
         loseSound = audio.createPlayable("/audio/evil_laugh.ogg", true);
         winSound = audio.createPlayable("/audio/win_melody.ogg", true);
@@ -89,9 +88,10 @@ public class Game implements IGameLogic {
         // Music Box
         musicBox = new MusicBox("/models/tower/tower2.obj", "/models/tower", parameters.getBackGroundMusicPath());
         musicBox.setScale(0.3f);
+
         musicBoxDuration = musicBox.getBackgroundMusic().getDurationInMiliSeconds();
         Vector3f musicBoxPosition = terrain.generateMusicBoxPosition(TERRAIN_SCALE, CAMERA_POS_STEP, musicBoxDuration);
-        musicBox.setPosition(musicBoxPosition.x, 3, musicBoxPosition.z);
+        musicBox.setPosition(musicBoxPosition.x, musicBoxPosition.y + 2, musicBoxPosition.z);
         scene.setMusicBox(musicBox);
 
         System.out.println("Music Box Location:");
@@ -140,7 +140,9 @@ public class Game implements IGameLogic {
         cameraInc.set(0, 0, 0);
         if (controlsDisabled)
             return;
-        if (window.isKeyPressed(GLFW_KEY_W)) {
+
+
+        if (window.isKeyPressed(GLFW_KEY_W) || mouseInput.isLeftButtonPressed()) {
             cameraInc.z = -1;
         } else if (window.isKeyPressed(GLFW_KEY_S)) {
             cameraInc.z = 1;
@@ -154,16 +156,18 @@ public class Game implements IGameLogic {
             cameraInc.y = -1;
         } else if (window.isKeyPressed(GLFW_KEY_X)) {
             cameraInc.y = 1;
-
+        }
+        //running
+        if ((window.isKeyPressed(GLFW_KEY_LEFT_SHIFT) || window.isKeyPressed(GLFW_KEY_RIGHT_SHIFT)) && player.canRun()) {
+            player.depleteStamina();
+            cameraInc.mul(2f);
         }
         if (window.isKeyPressed(GLFW_KEY_L)) {
             DebugHardcodedTestEndBoolean = true;
         }
-        if (window.isKeyPressed(GLFW_KEY_K)) {
-            scene.getSceneLight().getDirectionalLight().setColor(new Vector3f(255, 0, 0));
-            scene.getSceneLight().setAmbientLight(new Vector3f(255, 0, 0));
-        }
+        //the debug key, prints some info
         if (window.isKeyPressed(GLFW_KEY_G)) {
+
             Vector3f cameraPosition = player.getCamera().getPosition();
             Vector2f musicBoxXZ = new Vector2f(musicBox.getPosition().x, musicBox.getPosition().z);
             Vector2f cameraXZ = new Vector2f(cameraPosition.x, cameraPosition.z);
@@ -177,6 +181,15 @@ public class Game implements IGameLogic {
             System.out.println();
         }
 
+    }
+
+    private void showMusicBoxIfCloseEnough() {
+        Vector3f cameraPosition = player.getCamera().getPosition();
+        Vector2f musicBoxXZ = new Vector2f(musicBox.getPosition().x, musicBox.getPosition().z);
+        Vector2f cameraXZ = new Vector2f(cameraPosition.x, cameraPosition.z);
+        float distance = musicBoxXZ.distance(cameraXZ);
+        boolean shouldShow = distance < 2 * TERRAIN_SCALE;
+        musicBox.toggleMusicBoxVisiblity(shouldShow);
     }
 
     private void updateCurrentChunk() {
@@ -200,7 +213,9 @@ public class Game implements IGameLogic {
 
     private void UpdatePlayer() {
         //note we calculate the test position using 2*step and afterwards update it only 1*step
-        Vector3f newPositon = player.getCamera().calculateMovePosition(cameraInc.x * CAMERA_POS_STEP * 2f, 0, cameraInc.z * CAMERA_POS_STEP * 2f);
+        float incX = cameraInc.x * CAMERA_POS_STEP * 2f / Math.max(cameraInc.x, 1);
+        float incZ = cameraInc.z * CAMERA_POS_STEP * 2f / Math.max(cameraInc.z, 1);
+        Vector3f newPositon = player.getCamera().calculateMovePosition(incX, 0, incZ);
         float height = terrain.getHeight(newPositon.x, newPositon.z);
         player.updatePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP, height);
 
@@ -217,6 +232,8 @@ public class Game implements IGameLogic {
         }
         //Update the currentChnk
         updateCurrentChunk();
+        //show the music box if close enought
+        showMusicBoxIfCloseEnough();
         // Update camera position and player step sound
         UpdatePlayer();
 
@@ -246,7 +263,7 @@ public class Game implements IGameLogic {
     }
 
     private void endGame() {
-        musicBox.getBackgroundMusic().stop();
+        musicBox.getBackgroundMusic().fade();
         angleUpdatePerCycle = 0;
         controlsDisabled = true;
         SceneLight sceneLight = scene.getSceneLight();
@@ -289,9 +306,7 @@ public class Game implements IGameLogic {
         } else {
             sceneLight.getSkyBoxLight().set(1.0f, 1.0f, 1.0f);
             directionalLight.setIntensity(1);
-            directionalLight.getColor().x = 1;
-            directionalLight.getColor().y = 1;
-            directionalLight.getColor().z = 1;
+            directionalLight.setColor(new Vector3f(1f,1f,1f));
         }
         double angRad = Math.toRadians(lightAngle);
         directionalLight.getDirection().x = (float) Math.sin(angRad);

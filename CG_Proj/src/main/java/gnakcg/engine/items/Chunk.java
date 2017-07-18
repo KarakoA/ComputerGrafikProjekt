@@ -43,11 +43,12 @@ public class Chunk extends GameItem {
     }
 
     //x and z local coordinates
-    public float getApproxHeight(float x, float z) {
-        int xI = toHeightMapIndex(x);
-        int zI = toHeightMapIndex(z);
-
-        return getWorldHeight(xI, zI);
+    public Vector3f getMinimumHeightPointInLocalCoordinates() {
+        Vector2i minHeightI = heightMapMesh.getMinimumHeightCoordinates();
+        float minY = getWorldHeight(minHeightI.x, minHeightI.y);
+        float x = minHeightI.x / (float) CHUNK_SIZE;
+        float z = minHeightI.y / (float) CHUNK_SIZE;
+        return new Vector3f(x, minY, z);
     }
 
     //returns the height in world coordinates of a given point in world coordinates which is within this chunk
@@ -115,7 +116,6 @@ public class Chunk extends GameItem {
     }
 
     private float getWorldHeight(int row, int col) {
-
         float y = heightMapMesh.getHeight(row, col);
         return y * this.getScale() + this.getPosition().y;
     }

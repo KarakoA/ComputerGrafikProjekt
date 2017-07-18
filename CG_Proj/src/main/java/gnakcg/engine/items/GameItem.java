@@ -1,6 +1,7 @@
 package gnakcg.engine.items;
 
-import gnakcg.engine.Utils;
+import gnakcg.utils.ResourceLoader;
+import gnakcg.utils.Utils;
 import gnakcg.engine.graph.Mesh;
 import gnakcg.engine.loaders.StaticMeshesLoader;
 import org.joml.Vector3f;
@@ -46,7 +47,7 @@ public class GameItem {
      */
     public GameItem(String objFilePath, String texturesDir) throws Exception {
         this();
-        String path = Utils.getResourceAbsolutePath(objFilePath);
+        String path = ResourceLoader.getInstance().getResourcePath(objFilePath);
         this.setMeshes(StaticMeshesLoader.load(path, texturesDir));
     }
 

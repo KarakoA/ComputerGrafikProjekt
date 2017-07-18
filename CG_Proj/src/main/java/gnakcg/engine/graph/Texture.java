@@ -2,7 +2,8 @@ package gnakcg.engine.graph;
 
 import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
-import gnakcg.engine.Utils;
+import gnakcg.utils.ResourceLoader;
+import gnakcg.utils.Utils;
 
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -19,7 +20,7 @@ public class Texture {
     private final int id;
 
     public Texture(String fileName) throws Exception {
-        this(Utils.getResourceURL(fileName).openStream());
+        this(ResourceLoader.getInstance().getResourceAsStream(fileName));
     }
 
     public Texture(InputStream is) throws Exception {

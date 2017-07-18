@@ -1,9 +1,6 @@
 package gnakcg.engine.items;
 
-import java.io.File;
-
-import gnakcg.engine.Utils;
-import gnakcg.engine.loaders.StaticMeshesLoader;
+import gnakcg.engine.graph.Mesh;
 import gnakcg.engine.services.Audio;
 
 /**
@@ -14,6 +11,8 @@ import gnakcg.engine.services.Audio;
  */
 public class MusicBox extends GameItem {
     private Audio.Playable backgroundMusic;
+    private Mesh[] cachedMeshes;
+
 
     @Override
     public void setPosition(float x, float y, float z) {
@@ -26,12 +25,24 @@ public class MusicBox extends GameItem {
     }
 
     public MusicBox(String objFilePath, String texturesDir, String audioFilePath) throws Exception {
-        super(objFilePath,texturesDir);
-
+        super(objFilePath, texturesDir);
+        //save it and hide the mesh
+        cachedMeshes = getMeshes();
+        setMeshes(new Mesh[0]);
         //load audio
         backgroundMusic = Audio.getInstance().createPlayable(audioFilePath);
         backgroundMusic.setPosition(this.getPosition());
         backgroundMusic.enableSourceSoundDecrease();
         backgroundMusic.play();
+    }
+
+    public void toggleMusicBoxVisiblity(boolean shouldShow) {
+        if (shouldShow) {
+            if (this.getMeshes().length == 0)
+                this.setMeshes(cachedMeshes);
+        } else {
+            if (this.getMeshes().length != 0)
+                this.setMeshes(new Mesh[0]);
+        }
     }
 }

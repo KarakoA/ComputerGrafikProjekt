@@ -2,6 +2,7 @@ package gnakcg.engine;
 
 import gnakcg.engine.graph.Camera;
 import gnakcg.engine.services.Audio;
+import gnakcg.utils.Utils;
 
 /**
  * Encapsulates the player.
@@ -10,12 +11,15 @@ import gnakcg.engine.services.Audio;
  * @author Gires N.
  */
 public class Player {
+    private final float STEP_THRESHOLD = 0.09f;
+    private final int MAX_STAMINA = 200;
+
+
     private Camera camera;
     private float playerHeight;
     private float lastTerrainHeight;
-    private final float STEP_THRESHOLD = 0.09f;
-
-    private int stopCounter = 0;
+    private int stamina;
+    private int stopCounter;
 
     private Audio.Playable stepSound;
     private Audio audio;
@@ -32,8 +36,9 @@ public class Player {
         this.camera = camera;
         audio = Audio.getInstance();
         stepSound = audio.createPlayable("/audio/long_steps.ogg", true);
-        stepSound.setGain(0.03f);
+        stepSound.setGain(0.15f);
         lastTerrainHeight = 0;
+        stamina = MAX_STAMINA;
 
     }
 
@@ -48,7 +53,21 @@ public class Player {
             camera.getPosition().y = y;
         }
         updateAudio(x, z, cantMove);
+        addStamina();
+    }
 
+    private void addStamina() {
+        stamina+=1;
+        stamina = Math.min(MAX_STAMINA, stamina);
+    }
+
+    public void depleteStamina() {
+        stamina = stamina - 2;
+        stamina = Math.max(0, stamina);
+    }
+
+    public boolean canRun() {
+        return stamina > 10;
     }
 
     private void updateAudio(float xStep, float zStep, boolean cantMove) {

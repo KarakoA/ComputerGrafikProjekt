@@ -10,7 +10,7 @@ import java.util.Random;
  */
 public class GameParameters {
     public static final GameParameters DEFAULT_PARAMETERS =
-            new GameParameters(Difficulty.NORMAL, new Random().nextLong(), "/audio/background/lailaihei_short.ogg");
+            new GameParameters(Difficulty.NORMAL, new Random().nextLong(), "/audio/background/lailaihei_mixed.ogg");
     private final Difficulty difficulty;
     private final long seed;
     private String backGroundMusicPath;
@@ -34,7 +34,7 @@ public class GameParameters {
     }
 
     public enum Difficulty {
-        EASY(0.35f), NORMAL(0.75f), HARD(1.25f);
+        EASY(0.45f), NORMAL(0.85f), HARD(1.45f);
         public final float factor;
 
         Difficulty(float factor) {

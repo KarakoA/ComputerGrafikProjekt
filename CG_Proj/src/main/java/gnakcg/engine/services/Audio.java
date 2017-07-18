@@ -1,16 +1,15 @@
 package gnakcg.engine.services;
 
-import gnakcg.engine.Utils;
 import gnakcg.engine.graph.Transformation;
+import gnakcg.utils.ResourceLoader;
 import org.joml.*;
+import org.joml.Math;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALCCapabilities;
 import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.system.MemoryStack;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
@@ -24,6 +23,7 @@ import static gnakcg.game.Game.TERRAIN_SCALE;
 
 /**
  * Audio utility class. Plays ogg files using openAL.
+ *
  * @author Anton K.
  * @author Gires N.
  */
@@ -95,6 +95,8 @@ public class Audio {
 
     public class Playable implements AutoCloseable {
 
+        private final float FADE_STEP = 0.01f;
+
         private int sourcePointer;
         private int bufferPointer;
         private long durationInMiliSeconds;
@@ -105,8 +107,7 @@ public class Audio {
 
         private Playable(String fileName, boolean relative) throws RuntimeException {
             //get the correct absolute fileName
-            String path =Utils.getResourceAbsolutePath(fileName);
-
+            String path = ResourceLoader.getInstance().getResourcePath(fileName);
             //Allocate space to store return information from stb_vorbis_decode_filename
             MemoryStack.stackPush();
             IntBuffer channelsBuffer = MemoryStack.stackMallocInt(1);
@@ -114,6 +115,7 @@ public class Audio {
             IntBuffer sampleRateBuffer = MemoryStack.stackMallocInt(1);
             ShortBuffer rawAudioBuffer = stb_vorbis_decode_filename(path, channelsBuffer, sampleRateBuffer);
             if (rawAudioBuffer == null) {
+                System.out.println(path);
                 throw new RuntimeException("failed to create buffer. is the file path correct?");
             }
 
@@ -187,6 +189,19 @@ public class Audio {
             alSourceStop(sourcePointer);
         }
 
+        public void fade() {
+            float currentGain = getGain();
+            float newGain = Math.max(currentGain - FADE_STEP, 0);
+            System.out.println(newGain);
+            if (newGain == 0)
+                stop();
+            else {
+                alSourcef(sourcePointer, AL_MIN_GAIN, 0);
+                setGain(newGain);
+            }
+        }
+
+
         public void playIfNotAlreadyPlaying() {
             int state = (alGetSourcei(sourcePointer, AL_SOURCE_STATE));
             if (state != AL_PLAYING)
@@ -195,8 +210,12 @@ public class Audio {
 
         public void setGain(float gain) {
             //clip to 0-1
-            gain = Float.max(1, Float.min(0, gain));
+            gain = Float.min(1, Float.max(0, gain));
             alSourcef(sourcePointer, AL_GAIN, gain);
+        }
+
+        public float getGain() {
+            return alGetSourcef(sourcePointer, AL_GAIN);
         }
 
         public void enableSourceSoundDecrease() {

@@ -83,12 +83,8 @@ public class Terrain {
         Chunk chunkWithMusicBox = updater.createChunk(chunkCoordinates);
         chunkPositionToChunksMap.put(chunkCoordinates, chunkWithMusicBox);
 
-        //position within the chunk
-        Random r = ThreadLocalRandom.current();
-        float chunkLocalX = r.nextInt(CHUNK_SIZE) / (float) CHUNK_SIZE;
-        float chunkLocalZ = r.nextInt(CHUNK_SIZE) / (float) CHUNK_SIZE;
-        float y = chunkWithMusicBox.getApproxHeight(chunkLocalX, chunkLocalZ);
-        return new Vector3f(chunkCoordinates.x * terrainScale + chunkLocalX, y, chunkCoordinates.y * terrainScale + chunkLocalZ);
+        Vector3f minimum = chunkWithMusicBox.getMinimumHeightPointInLocalCoordinates();
+        return new Vector3f(chunkCoordinates.x * terrainScale + minimum.x, minimum.y, chunkCoordinates.y * terrainScale + minimum.z);
     }
 
     private Vector2i generateBoxChunkCoordinates(float terrainScale, float cameraStepSize, float songLengthInMiliSeconds) {
@@ -101,8 +97,10 @@ public class Terrain {
         Random r = ThreadLocalRandom.current();
         int signX = r.nextInt() > 0 ? 1 : -1;
         int signZ = r.nextInt() > 0 ? 1 : -1;
-        int x = (maxChunk + r.nextInt(4) - 2) * signX;
-        int z = (maxChunk + r.nextInt(4) - 2) * signZ;
+        int xRand = r.nextInt(2*maxChunk);
+        int yRand = 2*maxChunk - xRand;
+        int x = xRand * signX;
+        int z =yRand * signZ;
         //avoid creating in the start chunk
         if (x == 0 && z == 0) {
             x = 1;

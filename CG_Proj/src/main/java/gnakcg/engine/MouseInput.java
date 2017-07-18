@@ -7,7 +7,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Encapsulates mouse input.
- * Taken from the LWJGL Book.
+ * Based on the LWJGL Book.
  */
 public class MouseInput {
 
@@ -33,8 +33,18 @@ public class MouseInput {
             currentPos.y = ypos;
         });
         glfwSetMouseButtonCallback(window.getWindowHandle(), (windowHandle, button, action, mode) -> {
-            leftButtonPressed = button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS;
-            rightButtonPressed = button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS;
+            if (action == GLFW_PRESS) {
+                if (button == GLFW_MOUSE_BUTTON_1)
+                    leftButtonPressed = true;
+                if (button == GLFW_MOUSE_BUTTON_2)
+                    rightButtonPressed = true;
+            }
+            if (action == GLFW_RELEASE) {
+                if (button == GLFW_MOUSE_BUTTON_1)
+                    leftButtonPressed = false;
+                if (button == GLFW_MOUSE_BUTTON_2)
+                    rightButtonPressed = false;
+            }
         });
     }
 

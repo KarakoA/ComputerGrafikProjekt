@@ -5,6 +5,7 @@ import gnakcg.engine.SceneLight;
 
 import java.util.Collection;
 
+import gnakcg.utils.ResourceLoader;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -13,7 +14,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 import gnakcg.engine.items.GameItem;
 import gnakcg.engine.IHud;
-import gnakcg.engine.Utils;
+import gnakcg.utils.Utils;
 import gnakcg.engine.Window;
 
 /**
@@ -52,8 +53,8 @@ public class Renderer {
     private void setupSceneShader() throws Exception {
         // Create shader
         sceneShaderProgram = new ShaderProgram();
-        sceneShaderProgram.createVertexShader(Utils.loadResource("/shaders/scene_vertex.vs"));
-        sceneShaderProgram.createFragmentShader(Utils.loadResource("/shaders/scene_fragment.fs"));
+        sceneShaderProgram.createVertexShader(ResourceLoader.getInstance().loadResource("/shaders/scene_vertex.vs"));
+        sceneShaderProgram.createFragmentShader(ResourceLoader.getInstance().loadResource("/shaders/scene_fragment.fs"));
         sceneShaderProgram.link();
 
         // Create uniforms for modelView and projection matrices and texture
@@ -70,8 +71,8 @@ public class Renderer {
 
     private void setupHudAndSkyboxShader() throws Exception {
         hudAndSkyboxShaderProgram = new ShaderProgram();
-        hudAndSkyboxShaderProgram.createVertexShader(Utils.loadResource("/shaders/hud_vertex.vs"));
-        hudAndSkyboxShaderProgram.createFragmentShader(Utils.loadResource("/shaders/hud_fragment.fs"));
+        hudAndSkyboxShaderProgram.createVertexShader(ResourceLoader.getInstance().loadResource("/shaders/hud_vertex.vs"));
+        hudAndSkyboxShaderProgram.createFragmentShader(ResourceLoader.getInstance().loadResource("/shaders/hud_fragment.fs"));
         hudAndSkyboxShaderProgram.link();
 
         // Create uniforms for Ortographic-model projection matrix and base colour
