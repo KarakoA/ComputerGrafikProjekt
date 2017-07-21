@@ -1,0 +1,14 @@
+Starten:
+Die JAR-Datei nicht verschieben, das Spiel braucht die Ordner. Einfach Doppelklicken. (erfodert java Version 8(release 2014))
+
+Kurze Spielanleitung: 
+Das Ziel des Spiels ist es die Quelle der Music zu finden bevor diese zu Ende ist.
+Es ist gedacht das Spiel mit Kopfhörern zu spielen um die Musikquelle leichter zu lokalisieren.
+(Wenn man sich Links von der Musikquelle befindet hört man die Musik stärker in dem linken Kopfhörer und vise versa und je näher man ist desto stärker hört man sie)	
+
+Controls:
+Mouse - Kamera Steuerung
+WASD - Bewegung
+Shift halten - für kurze Zeit rennen. Während man rennt kann man jeden Terrain (egal wie steil) überwinden
+Escape - Spiel schließen
+
